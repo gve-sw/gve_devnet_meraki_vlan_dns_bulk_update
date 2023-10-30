@@ -198,9 +198,21 @@ def main():
     # Get appliance networks in org
     console.print(Panel.fit("Get Appliance Networks", title="Step 2"))
     networks = dashboard.organizations.getOrganizationNetworks(organizationId=org_id, total_pages='all')
-    networks = [network for network in networks if 'appliance' in network['productTypes']]
 
-    console.print(f"Found {len(networks)} Appliance Networks")
+    # Only select networks which contain an appliance and optionally filter the network names based on containing a
+    # key word from the NETWORK_NAMES list
+    filtered_networks = []
+    for network in networks:
+        if 'appliance' in network['productTypes']:
+            # Optional: filter based on provided network names as well (case-sensitive contains)
+            if len(config.NETWORK_NAME_FILTERS) > 0:
+                # Check for any network name matches, if there's a match add it
+                matches = any(network_name in network['name'] for network_name in config.NETWORK_NAME_FILTERS)
+                if matches:
+                    filtered_networks.append(network)
+            else:
+                filtered_networks.append(network)
+    console.print(f"Found the Following Matching Appliance Networks: {[net['name'] for net in filtered_networks]}")
 
     # Replace DHCP DNS Old Values with New Values
     console.print(Panel.fit("Update Old DNS Nameserver(s) to New Nameserver(s)", title="Step 3"))
@@ -217,7 +229,7 @@ def main():
         overwrite = Confirm.ask("Would you like to overwrite existing DNS Nameserver(s) on match?")
 
     print()
-    update_dhcp_dns_ips(networks, match_behavior, overwrite)
+    update_dhcp_dns_ips(filtered_networks, match_behavior, overwrite)
 
 
 if __name__ == "__main__":

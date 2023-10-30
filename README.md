@@ -37,13 +37,16 @@ In order to use the Meraki API, you need to enable the API for your organization
 ```dotenv
 API_KEY="0F...."
 ```
-4. Add Meraki Org Name to configuration variable in `config.py`. Provide a list of Old DNS values (**matching criteria**) and New DNS values in `config.py`. Depending on selected matching criteria, the old list is used to match VLANs and the new list represents replacement values for the old values. 
+4. Add Meraki Org Name to configuration variable in `config.py`. Specify an optional list of keywords to filter network names on. The filtering checks if the network name 'contains' one or more provided words. Provide a list of Old DNS values (**matching criteria**) and New DNS values in `config.py`. Depending on selected matching criteria, the old list is used to match VLANs and the new list represents replacement values for the old values. 
 ```
 Ex: Match all VLANs with only DNS values (X.X.X.X, Y.Y.Y.Y) and replace them with (Z.Z.Z.Z) (Explicit match - Option 2)
 ```
 ```python
 # Meraki API Section
 ORG_NAME = "Sample"
+
+# Keywords to Filter Network Names on (case-sensitive) - optional
+NETWORK_NAMES = [""]
 
 # DNS Values
 OLD_DHCP_DNS_VALUES = ["X.X.X.X", "Y.Y.Y.Y"]
